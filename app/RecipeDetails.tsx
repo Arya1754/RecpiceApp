@@ -67,12 +67,16 @@ export default function RecipeDetails() {
   const ingredientsIndexes = getIngredientsIndexes(mealData);
 
   const getYoutubeVideoId = (url: string | undefined) => {
-    if (!url) return undefined; 
-    const regex = /[?&]v=([^&]+)/;
+    if (!url) return undefined;
+    const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/;
     const match = url.match(regex);
     return match ? match[1] : undefined;
   };
   
+  const splitInstructions = (instructions: string | undefined) => {
+    if (!instructions) return [];
+    return instructions.split('.').filter(step => step.trim() !== '');
+  };
 
   if (loading) {
     return (
@@ -183,9 +187,11 @@ export default function RecipeDetails() {
 
       <View style={tw`px-4 py-8`}>
         <Text style={[{ fontSize: hp(2.5) }, tw`font-bold text-neutral-700 mb-4`]}>Instructions</Text>
-        <Text style={[{ fontSize: hp(2) }, tw`text-neutral-600 leading-7`]}>
-          {mealData?.strInstructions}
-        </Text>
+        {splitInstructions(mealData?.strInstructions).map((step, index) => (
+          <Text key={index} style={[{ fontSize: hp(2) }, tw`text-neutral-600 leading-7 mb-2`]}>
+            {index + 1}. {step.trim()}.
+          </Text>
+        ))}
       </View>
 
       <View style={tw`px-4 py-8`}>
